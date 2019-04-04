@@ -43,21 +43,14 @@ Status DequantizeLinear<T>::Compute(OpKernelContext* ctx) const {
   const auto& x_shape = x.Shape();
   const auto& scale_shape = x_scale.Shape();
   const auto& zero_point_shape = x_zero_point.Shape();
-  const int64_t axis = HandleNegativeAxis(axis_, x_shape.NumDimensions());
+  const int64_t axis = 0;
 
   size_t stride = 0;
   const auto& broadcastDim = x_shape[axis];
 
-  if (has_axis_) {
-    // if an axis was specified, ensure the scale and zero point are compatible
-    ORT_ENFORCE(scale_shape.NumDimensions() == 1 && scale_shape.Size() == broadcastDim, "x_scale must be 1D tensor with size ", broadcastDim);
-    ORT_ENFORCE(zero_point_shape.NumDimensions() == 1 && zero_point_shape.Size() == broadcastDim, "x_zero_point must be 1D tensor with size ", broadcastDim);
-    stride = 1;
-  } else {
-    // if no axis, enforce that scale and zero point are scalars
-    ORT_ENFORCE(scale_shape.NumDimensions() == 0, "x_scale must be a scalar if no axis is provided");
-    ORT_ENFORCE(zero_point_shape.NumDimensions() == 0, "x_zero_point must be a scalar if no axis is provided");
-  }
+  // enforce that scale and zero point are scalars
+  ORT_ENFORCE(scale_shape.NumDimensions() == 0 || (scale_shape.NumDimensions() == 1 && scale_shape.GetDims().size() == 1), "x_scale must be a scalar.");
+  ORT_ENFORCE(zero_point_shape.NumDimensions() == 0 || (zero_point_shape.NumDimensions() == 1 && zero_point_shape.GetDims().size() == 1), "x_zero_point must be a scalar.");
 
   size_t N = x_shape.SizeToDimension(axis);
   const T* zero_point = x_zero_point.template Data<T>();
@@ -117,21 +110,14 @@ Status QuantizeLinear<float>::Compute(OpKernelContext* ctx) const {
   const auto& x_shape = x.Shape();
   const auto& scale_shape = y_scale.Shape();
   const auto& zero_point_shape = y_zero_point.Shape();
-  const int64_t axis = HandleNegativeAxis(axis_, x_shape.NumDimensions());
+  const int64_t axis = 0;
 
   size_t stride = 0;
   const auto& broadcastDim = x_shape[axis];
 
-  if (has_axis_) {
-    // if an axis was specified, ensure the scale and zero point are compatible
-    ORT_ENFORCE(scale_shape.NumDimensions() == 1 && scale_shape.Size() == broadcastDim, "x_scale must be 1D tensor with size ", broadcastDim);
-    ORT_ENFORCE(zero_point_shape.NumDimensions() == 1 && zero_point_shape.Size() == broadcastDim, "x_zero_point must be 1D tensor with size ", broadcastDim);
-    stride = 1;
-  } else {
-    // if no axis, enforce that scale and zero point are scalars
-    ORT_ENFORCE(scale_shape.NumDimensions() == 0, "x_scale must be a scalar if no axis is provided");
-    ORT_ENFORCE(zero_point_shape.NumDimensions() == 0, "x_zero_point must be a scalar if no axis is provided");
-  }
+  //enforce that scale and zero point are scalars
+  ORT_ENFORCE(scale_shape.NumDimensions() == 0 || (scale_shape.NumDimensions() == 1 && scale_shape.GetDims().size() == 1), "x_scale must be a scalar.");
+  ORT_ENFORCE(zero_point_shape.NumDimensions() == 0 || (zero_point_shape.NumDimensions() == 1 && zero_point_shape.GetDims().size() == 1), "x_zero_point must be a scalar.");
 
   size_t N = x_shape.SizeToDimension(axis);
   const uint8_t* zero_point = y_zero_point.template Data<uint8_t>();

@@ -758,14 +758,13 @@ activation and leaky_relu_alpha.)DOC")
   ONNX_CONTRIB_OPERATOR_SCHEMA(QuantizeLinear)
       .SetDomain(kMSDomain)
       .SinceVersion(1)
-      .Attr("axis", "The axis along which same quantization parameters are applied. It's optional. If it's not specified, it means per-tensor quantization and input 'x_scale' and 'x_zero_point' must be scalars. If it's specified, it means per 'axis' quantization and input 'x_scale' and 'x_zero_point' must be 1-D tensors.", AttributeProto::INT, false)
       .Input(0, "x", "N-D full precision Input tensor to be quantized.", "T1")
       .Input(1, "y_scale", "Scale for doing quantization to get 'y'. It could be a scalar or a 1-D tensor, which means a per-tensor or per-axis quantization. If it's a 1-D tensor, its number of elements should be equal to the dimension value of 'axis' dimension of input 'x'.", "T1")
       .Input(2, "y_zero_point", "Zero point for doing quantization to get 'y'. It could be a scalar or a 1-D tensor, which means a per-tensor or per-axis quantization. If it's a 1-D tensor, its number of elements should be equal to the dimension value of 'axis' dimension of input 'x'.", "T2")
       .Output(0, "y", "N-D quantized output tensor. It has same shape as input 'x'.", "T2")
       .TypeConstraint(
           "T1",
-          {"tensor(float)"},
+          {"tensor(float)", "tensor(int32)"},
           "Constrain 'x', 'y_scale' to float tensors.")
       .TypeConstraint(
           "T2",
@@ -788,7 +787,6 @@ The quantization formula is y = (x / y_scale) + y_zero_point. For (x / y_scale),
   ONNX_CONTRIB_OPERATOR_SCHEMA(DequantizeLinear)
       .SetDomain(kMSDomain)
       .SinceVersion(1)
-      .Attr("axis", "the axis along which same quantization parameters are applied. It's optional. If it's not specified, it means per-tensor quantization and input 'x_scale' and 'x_zero_point' must be scalars. If it's specified, it means per 'axis' quantization and input 'x_scale' and 'x_zero_point' must be 1-D tensors.", AttributeProto::INT, false)
       .Input(0, "x", "N-D quantized Input tensor to be de-quantized.", "T2")
       .Input(1, "x_scale", "Scale for input 'x'. It could be a scalar or a 1-D tensor, which means a per-tensor or per-axis quantization. If it's a 1-D tensor, its number of elements should be equal to the dimension value of 'axis' dimension of input 'x'.", "T1")
       .Input(2, "x_zero_point", "Zero point for input 'x'. It could be a scalar or a 1-D tensor, which means a per-tensor or per-axis quantization. If it's a 1-D tensor, its number of elements should be equal to the dimension value of 'axis' dimension of input 'x'.", "T2")
@@ -799,7 +797,7 @@ The quantization formula is y = (x / y_scale) + y_zero_point. For (x / y_scale),
           "Constrain 'y', 'x_scale' to float tensors.")
       .TypeConstraint(
           "T2",
-          {"tensor(int8)", "tensor(uint8)"},
+          {"tensor(int8)", "tensor(uint8)", "tensor(int32)"},
           "Constrain 'x_zero_point' and 'x' to 8-bit integer tensors.")
       .SetDoc(R"DOC(
 The linear de-quantization operator. It consumes a quantized data, a scale, a zero point and computes the full precision data.
@@ -937,7 +935,7 @@ if the input is 8 bits or in 64 bits if the input is 16 bits.)DOC")
           "T3",
           {"tensor(int8)", "tensor(uint8)", "tensor(int16)", "tensor(uint16)"},
           "Constrain output types to 8-bit or 16-bit integer tensors.")
-      .TypeConstraint("T4", {"tensor(int32)", "tensor(uint32)"}, "Constrain bias type to 32-bit integer tensor.")
+      .TypeConstraint("T4", {"tensor(int32)"}, "Constrain bias type to 32-bit integer tensor.")
       .Attr(
           "auto_pad",
           auto_pad_doc,
