@@ -1,7 +1,7 @@
 # sets variables $(TestDataUrl) and $(TestDataChecksum)
 
 parameters:
-  TestDataUrl: https://onnxruntimetestdata.blob.core.windows.net/models/20190327.zip
+  TestDataUrl: https://onnxruntimetestdata.blob.core.windows.net/models/20190419.zip
   TestDataChecksum: 45166d81c021c8aae212b53c92101792
 
 steps:
