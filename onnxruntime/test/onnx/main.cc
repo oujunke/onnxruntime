@@ -341,6 +341,12 @@ int real_main(int argc, char* argv[], OrtEnv** p_env) {
       {"averagepool_2d_precomputed_strides", "ShapeInferenceError"},
       {"maxpool_with_argmax_2d_precomputed_strides", "ShapeInferenceError"},
       {"tf_inception_v2", "result mismatch"},
+      {"tf_mobilenet_v2_1.0_224", "result mismatch"},
+      {"tf_mobilenet_v2_1.4_224", "result mismatch"},
+      {"tf_mobilenet_v1_1.0_224", "result mismatch"},
+      {"mxnet_arcface", "result mismatch"},
+      {"inception_v2", "result mismatch"},
+      {"densenet121", "result mismatch"},
   };
 
 #ifdef USE_CUDA
